@@ -6,7 +6,7 @@ LivestreamerHelper indexes Twitch streams to play them with livestreamer made wi
 pip install livestreamer
 ```
 
-### How to use:
+### How to run:
 
 Simply run LivestreamerHelper.py like you would run any other Python program.
 
