@@ -8,7 +8,7 @@ class App:
 		print("INITIALIZING")
 	
 		self.root = Tk()
-		self.root.title("Livestreamer helper")
+		self.root.title("Livestreamer Helper")
 		self.tree = ttk.Treeview(self.root)
 
 		self.tree["columns"]=("one","two")
