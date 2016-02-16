@@ -5,3 +5,11 @@ LivestreamerHelper indexes Twitch streams to play them with livestreamer made wi
 ```
 pip install livestreamer
 ```
+
+### How to use:
+
+Simply run LivestreamerHelper.py like you would run any other Python program.
+
+Shift+Right Click on the Windows Explorer
+Click "Open command prompt here"
+Type `python LivestreamerHelper.py`
