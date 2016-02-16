@@ -10,6 +10,6 @@ pip install livestreamer
 
 Simply run LivestreamerHelper.py like you would run any other Python program.
 
-Shift+Right Click on the Windows Explorer
-Click "Open command prompt here"
-Type `python LivestreamerHelper.py`
+* Shift+Right Click on the Windows Explorer
+* Click "Open command prompt here"
+* Type `python LivestreamerHelper.py`
