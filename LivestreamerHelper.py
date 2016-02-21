@@ -1,57 +1,62 @@
 from tkinter import *
-from tkinter import ttk
-from collections import OrderedDict
 import requests, json, os
 
-class App:
-	def __init__(self):
-		print("INITIALIZING")
+class LivestreamerHelper:
+
+    def __init__(self):
+        print("LivestreamerHelper v1.1")
+        self.streamerList = []
+        self.root = Tk()
+        self.root.title("LivestreamerHelper v1.1")
+        
+        self.leftFrame = Frame(self.root)
+        self.rightFrame = Frame(self.root)
+        
+        self.leftFrame.pack(side = LEFT)
+        self.rightFrame.pack(side = RIGHT)
+        
+        self.listbox = Listbox(self.leftFrame, selectmode=SINGLE,width=50,height=25)
+        url_games = "https://api.twitch.tv/kraken/games/top?limit=25"
+
+        games = requests.get(url_games).json()
+
+        for key, item in enumerate(games['top']):
+            name = item['game']['name']
+            game_id = str(item['game']['_id'])
+            self.listbox.insert(END, name)
+            self.listbox.bind("<<ListboxSelect>>", self.gameSelected)
+        
+        self.listbox.pack()
+        
+        self.streams = Listbox(self.rightFrame, selectmode=SINGLE,width=150,height=25)
+        self.streams.insert(END, "Please select a game first...")
+        self.streams.pack()
+        
+        mainloop()
 	
-		self.root = Tk()
-		self.root.title("Livestreamer Helper")
-		self.tree = ttk.Treeview(self.root)
-
-		self.tree["columns"]=("one","two")
-		self.tree.column("one", width=500)
-		self.tree.column("two", width=100)
-		self.tree.heading("one", text="Streamer")
-		self.tree.heading("two", text="Viewers")
-
-		url_games = "https://api.twitch.tv/kraken/games/top?limit=25"
-		url_streamers = "https://api.twitch.tv/kraken/streams?game="
-
-		response = requests.get(url_games)
-
-		if(response.status_code == requests.codes.ok):
-
-			games = response.json(object_pairs_hook = OrderedDict)
-			for key, item in enumerate(games['top']):
-				name = item['game']['name']
-				game_viewers = item['viewers']
-				url_name = item['game']['name']
-				url_name = url_name.replace(" ", "+")
-				game_id = str(item['game']['_id'])
-				self.tree.insert("", "end", game_id, text=name, values=("", game_viewers))
-				streamers = requests.get(url_streamers + url_name)
-				
-				streamers_json = streamers.json(object_pairs_hook = OrderedDict)
-				
-				for skey, sitem in enumerate(streamers_json['streams']):
-					streamer_name = sitem['channel']['name']
-					streamer_viewers = str(sitem['viewers'])
-					print("STREAMER: " + streamer_name + "; VIEWERS: " + streamer_viewers)
-					self.tree.insert(game_id, "end", text="",values=(streamer_name, streamer_viewers))
-					self.tree.bind("<Double-1>", self.OnDoubleClick)
-					
-				print("GAME '" + name + "' INITIALIZED")
-			print("INITIALIZING FINISHED")
-			self.tree.pack()
-			self.root.mainloop()
-			
-	def OnDoubleClick(self, event):
-		item = self.tree.selection()[0]
-		selected = self.tree.item(item,"values")[0]
-		os.system("livestreamer http://twitch.tv/" + selected + " source")
-		
+    def gameSelected(self, event):
+        selectedGame = self.listbox.get(self.listbox.curselection())
+        selectedGame = selectedGame.replace(" ", "+")
+        self.streams.delete(0, END)
+        
+        url_streamers = "https://api.twitch.tv/kraken/streams?game="
+        url = url_streamers + selectedGame
+        
+        streamers = requests.get(url).json()
+        
+        for skey, sitem in enumerate(streamers['streams']):
+            channelname = sitem['channel']['name']
+            viewers = str(sitem['viewers'])
+            self.streamerList.append(channelname)
+            
+            self.streams.insert(END, channelname + " (" + viewers + " viewers) ")
+            self.streams.bind("<Double-1>", self.streamerSelected)
+        
+    def streamerSelected(self, event):
+        selection = self.streams.curselection()[0]
+        selectedChannel = self.streamerList[selection]
+        
+        os.system("start /wait cmd /c livestreamer http://twitch.tv/" + selectedChannel + " source")
+        
 if __name__ == "__main__":
-    app = App()
+    app = LivestreamerHelper()
