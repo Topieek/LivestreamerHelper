@@ -39,7 +39,7 @@ class LivestreamerHelper:
         selectedGame = selectedGame.replace(" ", "+")
         self.streams.delete(0, END)
         
-        url_streamers = "https://api.twitch.tv/kraken/streams?game="
+        url_streamers = "https://api.twitch.tv/kraken/streams?limit=1000&game="
         url = url_streamers + selectedGame
         
         streamers = requests.get(url).json()
