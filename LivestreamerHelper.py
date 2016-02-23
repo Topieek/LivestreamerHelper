@@ -20,12 +20,6 @@ class LivestreamerHelper:
         
         self.upperFrame.pack(side = TOP)
         self.bottomFrame.pack(side = BOTTOM)
-
-        self.leftButtonFrame = Frame(self.upperFrame)
-        self.leftButtonFrame.pack(side=LEFT)
-        
-        self.rightButtonFrame = Frame(self.upperFrame)
-        self.rightButtonFrame.pack(side=RIGHT)
         
         self.leftFrame.pack(side = LEFT)
         self.rightFrame.pack(side = RIGHT)
@@ -45,11 +39,11 @@ class LivestreamerHelper:
             self.configAmountStreamers = self.configFile.get("settings","amountStreamers")
             self.configAmountGames = self.configFile.get("settings","amountGames")
         
-        refreshButton = Button(self.leftButtonFrame, text="Refresh", command=self.refresh, width=20)
-        refreshButton.pack()
+        refreshButton = Button(self.upperFrame, text="Refresh", command=self.refresh, width=20).grid(row=0,column=0)
         
-        configButton = Button(self.rightButtonFrame, text="Configuration", command=self.config, width=20)
-        configButton.pack()
+        configButton = Button(self.upperFrame, text="Configuration", command=self.config, width=20).grid(row=0,column=1)
+        
+        quickButton = Button(self.upperFrame, text="Quick Watch", command=self.quick_watch, width=20).grid(row=0,column=2)
 	
         self.listbox = Listbox(self.leftFrame, selectmode=SINGLE,width=50,height=25)
         url_games = "https://api.twitch.tv/kraken/games/top?limit="+self.configAmountGames
@@ -137,6 +131,25 @@ class LivestreamerHelper:
             self.configFile.write(iniFile)
             messagebox.showinfo("Saved!", "Your settings have been saved. Some settings will apply after the next restart!")
             self.confTk.destroy()
+            
+    def quick_watch(self):
+        self.quickWatch = Tk()
+        self.quickWatch.title("LivestreamerHelper Quick Watch")
+        
+        self.quickWatchLabel_1 = Label(self.quickWatch, text="http://twitch.tv/").grid(row=0,column=0)
+        
+        self.quickWatchInput = Entry(self.quickWatch)
+        self.quickWatchInput.grid(row=0,column=1)
+        
+        self.quickWatchButton = Button(self.quickWatch, text="Watch!", command=self.quick_watch_now, width=20).grid(row=2, columnspan=2)
+        
+    def quick_watch_now(self):
+        quick_watch_channel = self.quickWatchInput.get()
+        if quick_watch_channel == "":
+            return False
+        else:
+            self.quickWatch.destroy()
+            os.system("start /wait cmd /c livestreamer http://twitch.tv/" + quick_watch_channel + " source")
             
 if __name__ == "__main__":
     app = LivestreamerHelper()
